@@ -1,0 +1,183 @@
+[package]
+name = "sigstore"
+description = "An experimental crate to interact with sigstore"
+version = "0.10.0"
+edition = "2021"
+authors = ["sigstore-rs developers"]
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/sigstore/sigstore-rs"
+
+[package.metadata.docs.rs]
+all-features = true
+
+[features]
+default = ["full-native-tls", "cached-client", "sigstore-trust-root", "bundle"]
+wasm = ["getrandom/js", "ring/wasm32_unknown_unknown_js", "chrono/wasmbind"]
+
+full-native-tls = [
+  "fulcio-native-tls",
+  "rekor-native-tls",
+  "cosign-native-tls",
+  "mock-client-native-tls",
+  "sigstore-trust-root-native-tls",
+]
+full-rustls-tls = [
+  "fulcio-rustls-tls",
+  "rekor-rustls-tls",
+  "cosign-rustls-tls",
+  "mock-client-rustls-tls",
+  "sigstore-trust-root-rustls-tls",
+]
+
+# This features is used by tests that use docker to create a registry
+test-registry = []
+
+oauth-native-tls = ["openidconnect/native-tls", "oauth"]
+oauth-rustls-tls = ["openidconnect/rustls-tls", "oauth"]
+oauth = ["openidconnect"]
+
+fulcio-native-tls = ["oauth-native-tls", "reqwest/native-tls", "fulcio"]
+fulcio-rustls-tls = ["oauth-rustls-tls", "reqwest/rustls-tls", "fulcio"]
+fulcio = ["oauth", "serde_with"]
+
+rekor-native-tls = ["reqwest/native-tls", "rekor"]
+rekor-rustls-tls = ["reqwest/rustls-tls", "rekor"]
+rekor = ["reqwest"]
+
+sign = ["sigstore_protobuf_specs", "fulcio", "rekor", "cert"]
+verify = ["sigstore_protobuf_specs", "fulcio", "rekor", "cert"]
+bundle = ["sign", "verify"]
+
+sigstore-trust-root = [
+  "sigstore_protobuf_specs",
+  "futures-util",
+  "tough",
+  "reqwest_0_11",
+  "regex",
+  "tokio/sync",
+]
+sigstore-trust-root-native-tls = [
+  "reqwest_0_11/native-tls",
+  "sigstore-trust-root",
+]
+sigstore-trust-root-rustls-tls = [
+  "reqwest_0_11/rustls-tls",
+  "sigstore-trust-root",
+]
+
+cosign-native-tls = [
+  "oci-distribution/native-tls",
+  "cert",
+  "cosign",
+  "registry-native-tls",
+]
+cosign-rustls-tls = [
+  "oci-distribution/rustls-tls",
+  "cert",
+  "cosign",
+  "registry-rustls-tls",
+]
+cosign = ["olpc-cjson"]
+cert = []
+
+registry-native-tls = ["oci-distribution/native-tls", "registry"]
+registry-rustls-tls = ["oci-distribution/rustls-tls", "registry"]
+registry = ["olpc-cjson"]
+
+mock-client-native-tls = ["oci-distribution/native-tls", "mock-client"]
+mock-client-rustls-tls = ["oci-distribution/rustls-tls", "mock-client"]
+mock-client = []
+
+cached-client = ["cached"]
+
+[dependencies]
+
+[dev-dependencies]
+anyhow = { version = "1.0", features = ["backtrace"] }
+assert-json-diff = "2.0"
+clap = { version = "4.5", features = ["derive"] }
+docker_credential = "1.3"
+openssl = "0.10"
+rstest = "0.23"
+serial_test = "3.1"
+tempfile = "3.12"
+testcontainers = "0.23"
+tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# cosign example mappings
+
+[[example]]
+name = "verify"
+path = "examples/cosign/verify/main.rs"
+
+[[example]]
+name = "verify-blob"
+path = "examples/cosign/verify-blob/main.rs"
+
+[[example]]
+name = "verify-bundle"
+path = "examples/cosign/verify-bundle/main.rs"
+
+[[example]]
+name = "sign"
+path = "examples/cosign/sign/main.rs"
+
+# openidconnect example mappings
+
+[[example]]
+name = "openidconnect"
+path = "examples/openidflow/openidconnect/main.rs"
+
+# key interface mappings
+
+[[example]]
+name = "key_pair_gen_sign_verify"
+path = "examples/key_interface/key_pair_gen_sign_verify/main.rs"
+
+[[example]]
+name = "key_pair_gen_and_export"
+path = "examples/key_interface/key_pair_gen_and_export/main.rs"
+
+[[example]]
+name = "key_pair_import"
+path = "examples/key_interface/key_pair_import/main.rs"
+
+# rekor example mappings
+
+[[example]]
+name = "create_log_entry"
+path = "examples/rekor/create_log_entry/main.rs"
+
+[[example]]
+name = "get_log_entry_by_index"
+path = "examples/rekor/get_log_entry_by_index/main.rs"
+
+[[example]]
+name = "get_log_entry_by_uuid"
+path = "examples/rekor/get_log_entry_by_uuid/main.rs"
+
+[[example]]
+name = "get_log_info"
+path = "examples/rekor/get_log_info/main.rs"
+
+[[example]]
+name = "get_log_proof"
+path = "examples/rekor/get_log_proof/main.rs"
+
+[[example]]
+name = "get_public_key"
+path = "examples/rekor/get_public_key/main.rs"
+
+[[example]]
+name = "search_index"
+path = "examples/rekor/search_index/main.rs"
+
+[[example]]
+name = "search_log_query"
+path = "examples/rekor/search_log_query/main.rs"
+
+[[example]]
+name = "fulcio_cert"
+path = "examples/fulcio/cert/main.rs"
